@@ -2,6 +2,10 @@ package com.mycompany.grupo4pfa1.ui;
 
 import com.mycompany.grupo4pfa1.modelo.Paciente;
 import com.mycompany.grupo4pfa1.servicio.GestorAtencion;
+import com.mycompany.grupo4pfa1.servicio.GestionAbandono;
+import com.mycompany.grupo4pfa1.modelo.Queja;
+import com.mycompany.grupo4pfa1.estructuras.Nodo;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Scanner;
 
@@ -15,6 +19,7 @@ public class Menus {
     private Scanner entrada = new Scanner(System.in);
 
     private GestorAtencion gestor = new GestorAtencion();
+    private GestionAbandono gestionAbandono = new GestionAbandono(gestor);
 
     private int contadorRegular = 0;
     private int contadorPreferencial = 0;
@@ -74,15 +79,15 @@ public class Menus {
             }
             if (opcion.equals("3")) {
                 valida = true;
-                System.out.println("Opcion pendiente de implementar.");
+                abandonarCola();
             }
             if (opcion.equals("4")) {
                 valida = true;
-                System.out.println("Opcion pendiente de implementar.");
+                mostrarFichasPendientes();
             }
             if (opcion.equals("5")) {
                 valida = true;
-                System.out.println("Opcion pendiente de implementar.");
+                mostrarQuejasRecibidas();
             }
             if (opcion.equals("6")) {
                 valida = true;
@@ -143,5 +148,71 @@ public class Menus {
         System.out.println("\n===== AYUDA =====");
         System.out.println("Version de la herramienta: Avance 1 V 1.0.1");
         System.out.println("Desarrollado por: Grupo 4");
+        System.out.println("Integrantes: completar con los nombres del grupo antes de entregar.");
+    }
+   
+    /** Muestra las fichas pendientes sin desencolar pacientes. */
+    public void mostrarFichasPendientes() {
+        System.out.println("\n===== FICHAS PENDIENTES =====");
+        if (gestor.getColaRegular().estaVacia() && gestor.getColaPreferencial().estaVacia()) {
+            System.out.println("No hay fichas pendientes.");
+            return;
+        }
+        System.out.println("[REGULAR]");
+        mostrarCola(gestor.getColaRegular().getFrente());
+        System.out.println("[PREFERENCIAL]");
+        mostrarCola(gestor.getColaPreferencial().getFrente());
+    }
+
+    private void mostrarCola(Nodo<Paciente> actual) {
+        if (actual == null) System.out.println("Sin pacientes pendientes.");
+        while (actual != null) {
+            Paciente paciente = actual.getDato();
+            System.out.println("Ficha #" + paciente.getNumeroFicha() + " - Cedula: "
+                    + paciente.getCedula() + " - Nombre: " + paciente.getNombre());
+            actual = actual.getSiguiente();
+        }
+    }
+
+    /** Recorre la pila sin desapilar las quejas. */
+    public void mostrarQuejasRecibidas() {
+        System.out.println("\n===== QUEJAS RECIBIDAS =====");
+        Nodo<Queja> actual = gestionAbandono.getPilaQuejas().getCima();
+        if (actual == null) {
+            System.out.println("No hay quejas recibidas.");
+            return;
+        }
+        SimpleDateFormat formato = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+        while (actual != null) {
+            Queja queja = actual.getDato();
+            System.out.println("Ficha #" + queja.getNumeroFicha() + " con cedula "
+                    + queja.getCedula() + " abandona la cola sin ser atendido(a) a la fecha y hora "
+                    + formato.format(queja.getFechaHoraAbandono()) + " por el siguiente motivo: "
+                    + queja.getMotivo());
+            actual = actual.getSiguiente();
+        }
+    }
+
+    /** Registra el abandono y su motivo en la pila de quejas. */
+    public void abandonarCola() {
+        System.out.print("Numero de ficha que abandona: ");
+        String ficha = entrada.nextLine().trim();
+        if (ficha.isEmpty()) {
+            System.out.println("Debe indicar el numero de ficha.");
+            return;
+        }
+        System.out.print("Motivo de salida: ");
+        String motivo = entrada.nextLine().trim();
+        if (motivo.isEmpty()) {
+            System.out.println("Debe indicar el motivo de salida.");
+            return;
+        }
+        Queja queja = gestionAbandono.abandonar(ficha, motivo);
+        if (queja == null) {
+            System.out.println("No se encontro una ficha pendiente con ese numero.");
+        } else {
+            System.out.println("Ficha #" + queja.getNumeroFicha() + " con cedula "
+                    + queja.getCedula() + " abandona la cola sin ser atendido(a).");
+        }
     }
 }
