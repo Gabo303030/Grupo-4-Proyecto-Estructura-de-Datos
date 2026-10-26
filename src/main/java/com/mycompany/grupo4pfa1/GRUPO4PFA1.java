@@ -4,6 +4,8 @@
 
 package com.mycompany.grupo4pfa1;
 
+import com.mycompany.grupo4pfa1.ui.Menus;
+
 /**
  *
  * @author gabov
@@ -11,6 +13,7 @@ package com.mycompany.grupo4pfa1;
 public class GRUPO4PFA1 {
 
     public static void main(String[] args) {
-        System.out.println("Hello World!");
+        Menus miMenu = new Menus();
+        miMenu.menuPrincipal();
     }
 }

@@ -61,7 +61,7 @@ public class GestorAtencion {
         if (paciente == null) {
             return "No hay pacientes en espera.";
         }
-        return "Ficha #" + paciente.getFicha() + " con cédula " + paciente.getCedula()
+        return "Ficha #" + paciente.getNumeroFicha() + " con cédula " + paciente.getCedula()
                 + " pasar a consulta médica.";
     }
 
