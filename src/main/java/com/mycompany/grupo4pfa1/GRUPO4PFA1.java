@@ -1,14 +1,11 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- */
-
 package com.mycompany.grupo4pfa1;
 
 import com.mycompany.grupo4pfa1.ui.Menus;
 
 /**
+ * Punto de entrada del MVP del hospital "Su Salud".
  *
- * @author gabov
+ * @author Daniela Villegas
  */
 public class GRUPO4PFA1 {
 
