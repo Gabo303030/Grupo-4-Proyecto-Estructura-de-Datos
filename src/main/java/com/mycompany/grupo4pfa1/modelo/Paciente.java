@@ -4,8 +4,9 @@ import java.util.Date;
 
 /**
  * Datos de un paciente que llega a solicitar ficha.
+ * Es la información que se guarda en el nodo de la cola.
  *
- * @author daniv
+ * @author Daniela Villegas
  */
 public class Paciente {
 
@@ -29,8 +30,28 @@ public class Paciente {
         this.tipoPaciente = tipoPaciente;
     }
 
+    /**
+     * Indica si el paciente pertenece a la cola preferencial.
+     *
+     * @return true si es paciente preferencial
+     */
     public boolean isPreferencial() {
         return PREFERENCIAL.equals(tipoPaciente);
+    }
+
+    /**
+     * Convierte una cédula (texto con solo dígitos) a número para poder
+     * ordenar las listas de menor a mayor.
+     *
+     * @param cedula cédula del paciente
+     * @return la cédula como número, o 0 si no se puede convertir
+     */
+    public static long cedulaANumero(String cedula) {
+        try {
+            return Long.parseLong(cedula.trim());
+        } catch (Exception e) {
+            return 0;
+        }
     }
 
     public String getNumeroFicha() {
@@ -71,5 +92,10 @@ public class Paciente {
 
     public void setTipoPaciente(String tipoPaciente) {
         this.tipoPaciente = tipoPaciente;
+    }
+
+    @Override
+    public String toString() {
+        return "Ficha # " + numeroFicha + " - Cedula: " + cedula + " - Nombre: " + nombre;
     }
 }
