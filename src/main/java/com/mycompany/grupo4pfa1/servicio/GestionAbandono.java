@@ -1,82 +1,46 @@
 package com.mycompany.grupo4pfa1.servicio;
 
-import com.mycompany.grupo4pfa1.estructuras.Cola;
-import com.mycompany.grupo4pfa1.estructuras.Nodo;
-import com.mycompany.grupo4pfa1.estructuras.Pila;
+import com.mycompany.grupo4pfa1.estructuras.pilas.PilaQuejas;
 import com.mycompany.grupo4pfa1.modelo.Paciente;
 import com.mycompany.grupo4pfa1.modelo.Queja;
 
 /**
- * Retira pacientes que abandonan la cola y registra su queja en la pila.
+ * Retira de la cola a los pacientes que abandonan sin ser atendidos y
+ * registra su queja en la Pila de Quejas.
  * Usa las mismas colas de GestorAtencion para no duplicar pacientes.
+ *
+ * @author Gabriel Alvarez
  */
 public class GestionAbandono {
 
-    private final GestorAtencion gestor;
-    private final Pila<Queja> pilaQuejas;
+    private GestorAtencion gestor;
+    private PilaQuejas pilaQuejas;
 
     public GestionAbandono(GestorAtencion gestor) {
         this.gestor = gestor;
-        this.pilaQuejas = new Pila<>();
+        this.pilaQuejas = new PilaQuejas();
     }
 
     /**
-     * Retira de su cola al paciente con la ficha indicada y apila la queja.
+     * Elimina de su cola al paciente con la ficha indicada y apila la queja.
+     * Los demás pacientes de la cola quedan sin alteración.
      *
+     * @param ficha número de ficha que se está retirando
+     * @param motivo motivo de salida
      * @return la queja registrada, o null si no hay una ficha pendiente con ese número
      */
     public Queja abandonar(String ficha, String motivo) {
-        if (ficha == null || motivo == null) {
-            return null;
-        }
-        Paciente paciente = retirarPorFicha(gestor.getColaRegular(), ficha);
+        Paciente paciente = gestor.getColaRegular().eliminarPorFicha(ficha);
         if (paciente == null) {
-            paciente = retirarPorFicha(gestor.getColaPreferencial(), ficha);
+            paciente = gestor.getColaPreferencial().eliminarPorFicha(ficha);
         }
         if (paciente == null) {
             return null;
         }
-        Queja queja = new Queja(paciente, motivo.trim());
-        pilaQuejas.apilar(queja);
-        return queja;
+        return pilaQuejas.registrarAbandono(paciente, motivo);
     }
 
-    /**
-     * Busca la ficha recorriendo la cola sin modificarla.
-     */
-    private Paciente buscarPorFicha(Cola<Paciente> cola, String ficha) {
-        Nodo<Paciente> actual = cola.getFrente();
-        while (actual != null) {
-            Paciente paciente = actual.getDato();
-            if (paciente != null && ficha.trim().equalsIgnoreCase(paciente.getNumeroFicha())) {
-                return paciente;
-            }
-            actual = actual.getSiguiente();
-        }
-        return null;
-    }
-
-    /**
-     * Retira al paciente rotando la cola una vuelta completa: cada paciente se
-     * desencola y se vuelve a encolar, excepto el que abandona. Así se conserva
-     * el orden de los demás usando solo operaciones FIFO.
-     */
-    private Paciente retirarPorFicha(Cola<Paciente> cola, String ficha) {
-        Paciente encontrado = buscarPorFicha(cola, ficha);
-        if (encontrado == null) {
-            return null;
-        }
-        int cantidad = cola.getTamano();
-        for (int i = 0; i < cantidad; i++) {
-            Paciente paciente = cola.desencolar();
-            if (paciente != encontrado) {
-                cola.encolar(paciente);
-            }
-        }
-        return encontrado;
-    }
-
-    public Pila<Queja> getPilaQuejas() {
+    public PilaQuejas getPilaQuejas() {
         return pilaQuejas;
     }
 }
